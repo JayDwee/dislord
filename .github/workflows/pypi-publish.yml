@@ -22,9 +22,9 @@ jobs:
         --user
 
     - name: config version
-      run: >-
+      run: |
         echo "${{github.ref_name}}"
-        if [["${{github.ref_name}} =~ ^(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?$]]; then
+        if ["[${{github.ref_name}}" =~ ^(\d+!)?(\d+)(\.\d+)+([\.\-\_])?((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)?)\d*)?(\.?(post|dev)\d*)?$]]; then
           sed -i 's/version = ".*"/version = "'"${{github.ref_name}}"'"/g' pyproject.toml
         fi  
 
