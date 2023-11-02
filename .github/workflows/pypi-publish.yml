@@ -26,7 +26,8 @@ jobs:
         echo "${{github.ref_name}}"
         if [[ "${{github.ref_name}}" =~ '^([0-9]+\.){2}[0-9]+(\-[0-9]+)?$' ]]; then
           sed -i 's/version = ".*"/version = "'"${{github.ref_name}}"'"/g' pyproject.toml
-        fi  
+        fi
+        cat pyproject.toml
 
     - name: Build a binary wheel and a source tarball
       run: python3 -m build
