@@ -26,6 +26,7 @@ jobs:
         echo "${{github.ref_name}}"
         if [[ "${{github.ref_name}}" =~ '^([0-9]+\.){2}[0-9]+(\-[0-9]+)?$' ]]; then
           sed -i 's/version = ".*"/version = "'"${{github.ref_name}}"'"/g' pyproject.toml
+          echo "sed completed with "'s/version = ".*"/version = "'"${{github.ref_name}}"'"/g'
         fi
         cat pyproject.toml
 
