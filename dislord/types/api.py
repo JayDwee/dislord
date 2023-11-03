@@ -14,17 +14,17 @@ class HttpResponse:
         self.headers = headers
 
     def as_serverless_response(self):
-        return {"statusCode": self.status_code,
+        return {"statusCode": str(self.status_code),
                 "body": json.dumps(self.body, separators=(',', ':')) if isinstance(self.body, dict) else self.body,
                 "headers": self.headers}
 
     def as_server_response(self):
-        return self.body, self.status_code
+        return self.body, int(self.status_code)
 
 
 class HttpOk(HttpResponse):
-    status_code = int(OK)
+    status_code = OK
 
 
 class HttpUnauthorized(HttpResponse):
-    status_code = int(UNAUTHORIZED)
+    status_code = UNAUTHORIZED
