@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from http.client import OK, UNAUTHORIZED
 
@@ -5,7 +6,7 @@ from http.client import OK, UNAUTHORIZED
 @dataclass
 class HttpResponse:
     status_code: int
-    body: dict
+    body: [dict, str]
     headers: dict
 
     def __init__(self, body, *, headers=None):
@@ -14,7 +15,7 @@ class HttpResponse:
 
     def as_serverless_response(self):
         return {"statusCode": self.status_code,
-                "body": self.body,
+                "body": json.dumps(self.body) if isinstance(self.body, dict) else self.body,
                 "headers": self.headers}
 
     def as_server_response(self):
