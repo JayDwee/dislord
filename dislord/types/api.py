@@ -14,7 +14,7 @@ class HttpResponse:
         self.headers = headers
 
     def as_serverless_response(self):
-        return {"statusCode": str(self.status_code),
+        return {"statusCode": int(self.status_code),
                 "body": json.dumps(self.body, separators=(',', ':')) if isinstance(self.body, dict) else self.body,
                 "headers": self.headers}
 
