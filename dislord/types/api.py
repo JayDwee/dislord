@@ -23,8 +23,8 @@ class HttpResponse:
 
 
 class HttpOk(HttpResponse):
-    status_code = OK
+    status_code = int(OK)
 
 
 class HttpUnauthorized(HttpResponse):
-    status_code = UNAUTHORIZED
+    status_code = int(UNAUTHORIZED)
