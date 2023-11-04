@@ -11,8 +11,7 @@ client = dislord.ApplicationClient(PUBLIC_KEY, BOT_TOKEN)
 
 @client.command(name="hello")
 def hello(interaction: Interaction):
-    guilds = client.get_guilds()
-    return InteractionResponse.message(content="Servers:\n"+"\n".join([f"{g.name} {g.afk_timeout}" for g in guilds]))
+    return InteractionResponse.message(content=f"Hello {interaction.user}")
 
 
 def serverless_handler(event, context):  # Not needed if using server

@@ -1,12 +1,12 @@
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, MISSING
 
 from models.base import BaseModel
-from models.type import Snowflake
+from models.type import Snowflake, PartialOptional
 
 
 @dataclass
-class PartialGuild(BaseModel):
+class Guild(BaseModel):
     id: Snowflake
     name: str
     # features: list[GuildFeature] FIXME: Add Enum
@@ -16,22 +16,19 @@ class PartialGuild(BaseModel):
     approximate_member_count: Optional[int]
     approximate_presence_count: Optional[int]
 
-
-@dataclass
-class Guild(PartialGuild):
-    owner_id: Snowflake
-    afk_timeout: int
-    verification_level: int
-    default_message_notifications: int
-    explicit_content_filter: int
-    # roles: list[Role] FIXME: Add Enum
-    # emojis: list[Emoji] FIXME: Add Enum
-    mfa_level: int
-    system_channel_flags: int
-    premium_tier: int
-    public_updates_channel_id: Snowflake
-    nsfw_level: int
-    premium_progress_bar_enabled: bool
+    owner_id: PartialOptional[Snowflake]
+    afk_timeout: PartialOptional[int]
+    verification_level: PartialOptional[int]
+    default_message_notifications: PartialOptional[int]
+    explicit_content_filter: PartialOptional[int]
+    # roles: PartialOptional[list[Role]] FIXME: Add Enum
+    # emojis: PartialOptional[list[Emoji]] FIXME: Add Enum
+    mfa_level: PartialOptional[int]
+    system_channel_flags: PartialOptional[int]
+    premium_tier: PartialOptional[int]
+    public_updates_channel_id: PartialOptional[Snowflake]
+    nsfw_level: PartialOptional[int]
+    premium_progress_bar_enabled: PartialOptional[bool]
     safety_alerts_channel_id: Optional[Snowflake]
     icon_hash: Optional[str]
     splash: Optional[str]
@@ -52,3 +49,17 @@ class Guild(PartialGuild):
     max_video_channel_users: Optional[int]
     # welcome_screen: Optional[WelcomeScreen] FIXME
     # stickers: Optional[list[Sticker]] FIXME
+
+
+@dataclass
+class PartialGuild(Guild):
+    def __getattribute__(self, item):
+        attr = super().__getattribute__(item)
+        if attr is MISSING:
+            self.__class__ = Guild
+            guild = self.client.get_guild(self.id)
+            for a in self.__annotations__:
+                setattr(self, a, getattr(guild, a))
+            return self.__getattribute__(item)
+        else:
+            return attr

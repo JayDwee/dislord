@@ -6,30 +6,35 @@ import inspect
 from enum import Enum, EnumType
 from typing import get_type_hints, Union
 
+from models.type import PartialOptional
 
-def cast(obj, type_hint, param_name=None):
+
+def cast(obj, type_hint, param_name=None, client=None):
     if type_hint is None:
         return obj
 
     if isinstance(obj, list) and getattr(type_hint, "__origin__", None) is list:
-        return [cast(o, type_hint.__args__[0]) for o in obj]
+        return [cast(o, type_hint.__args__[0], param_name, client) for o in obj]
     elif isinstance(obj, dict) and getattr(type_hint, "__origin__", None) is dict:
         # return {ok: ov for (ok, ov) in obj.items()}
         raise NotImplementedError("TODO")
 
-    if obj is None:
+    if obj is None or obj is dataclasses.MISSING:
         if getattr(type_hint, "__origin__", None) is Union and type(None) in type_hint.__args__:
-            return None
+            return obj
         else:
             raise RuntimeError(f"Required field {param_name if param_name else ''} is not given for type: {type_hint}")
 
     if dataclasses.is_dataclass(type_hint):
-        return type_hint.from_dict(obj)
+        if type_hint.is_base_model():
+            return type_hint.from_dict(obj, client)
+        else:
+            return type_hint.from_dict(obj)
     elif isinstance(type_hint, EnumType):
         return type_hint(obj)
     elif getattr(type_hint, '__origin__', None) is Union:
         for u_type in type_hint.__args__:
-            return cast(obj, u_type)
+            return cast(obj, u_type, param_name, client)
     else:
         return obj
 
@@ -37,13 +42,19 @@ def cast(obj, type_hint, param_name=None):
 @dataclass
 class BaseModel:
     @classmethod
-    def from_dict(cls, env):
+    def from_dict(cls, env, client):
         type_hints = get_type_hints(cls)
 
         params = {}
         for p, hint in type_hints.items():
-            params[p] = cast(env.get(p), hint, p)
-        return cls(**params) # noqa
+            params[p] = cast(env.get(p, dataclasses.MISSING), hint, p)
+        obj = cls(**params)  # noqa
+        obj.client = client
+        return obj
+
+    @staticmethod
+    def is_base_model():
+        return True
 
 
 class EnhancedJSONEncoder(json.JSONEncoder):
@@ -52,4 +63,6 @@ class EnhancedJSONEncoder(json.JSONEncoder):
             return dataclasses.asdict(o)
         if isinstance(o, Enum):
             return o.value
+        if dataclasses.MISSING:
+            return None
         return super().default(o)

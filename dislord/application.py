@@ -4,7 +4,9 @@ import requests
 from discord_interactions import verify_key
 
 from api import DiscordApi
+from models.channel import Channel
 from models.guild import Guild, PartialGuild
+from models.user import User
 from .error import StateConfigurationException, DiscordApiException
 from models.api import HttpResponse, HttpUnauthorized, HttpOk
 from .models.interaction import Interaction, InteractionResponse, InteractionType
@@ -14,14 +16,14 @@ class ApplicationClient:
     def __init__(self, public_key, bot_token):
         self.commands = {}
         self.public_key = public_key
-        self.api = DiscordApi(bot_token)
+        self.api = DiscordApi(self, bot_token)
 
     def interact(self, raw_request, signature, timestamp) -> HttpResponse:
         if signature is None or timestamp is None or not verify_key(json.dumps(raw_request, separators=(',', ':'))
                                                                         .encode('utf-8'), signature, timestamp,
                                                                     self.public_key):
             return HttpUnauthorized('Bad request signature')
-        req = Interaction.from_dict(raw_request)
+        req = Interaction.from_dict(raw_request, self)
         if req.type == InteractionType.PING:  # PING
             response_data = InteractionResponse.pong()  # PONG
         elif req.type == InteractionType.APPLICATION_COMMAND:
@@ -56,5 +58,14 @@ class ApplicationClient:
             print(f"🫴 Response: {response}")
             return response
 
-    def get_guilds(self):
+    def get_user(self, user_id=None):
+        return self.api.get(f"/users/{user_id if user_id else '@me'}", type_hint=User)
+
+    def get_guild(self, guild_id) -> Guild:
+        return self.api.get(f"/guilds/{guild_id}", type_hint=Guild)
+
+    def get_guilds(self) -> list[PartialGuild]:
         return self.api.get("/users/@me/guilds", type_hint=list[PartialGuild])
+
+    def get_channel(self, channel_id) -> list[Channel]:
+        return self.api.get(f"/channels/{channel_id}", type_hint=list[Channel])

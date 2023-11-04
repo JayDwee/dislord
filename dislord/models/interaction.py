@@ -4,6 +4,7 @@ from enum import Enum
 
 from dislord.models.base import BaseModel
 from dislord.models.type import Snowflake
+from models.user import User
 
 
 class InteractionType(Enum):
@@ -39,7 +40,7 @@ class Interaction(BaseModel):
     # channel: Optional[PartialChannel] FIXME
     channel_id: Optional[Snowflake]
     # member: Optional[GuildMember] FIXME
-    # user: Optional[User] FIXME
+    user: Optional[User]
     # message: Optional[Message] FIXME
     app_permissions:  Optional[str]
     locale:  Optional[str]  # This is available on all interaction types except PING
@@ -81,5 +82,5 @@ class InteractionResponse(BaseModel):
     @staticmethod
     def message(**kwargs):
         cls = InteractionResponse(InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE,
-                                  InteractionCallbackData.from_dict(kwargs))
+                                  InteractionCallbackData.from_dict(kwargs, None))
         return cls
