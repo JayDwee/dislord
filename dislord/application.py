@@ -3,15 +3,18 @@ import json
 import requests
 from discord_interactions import verify_key
 
+from api import DiscordApi
+from models.guild import Guild, PartialGuild
 from .error import StateConfigurationException, DiscordApiException
 from models.api import HttpResponse, HttpUnauthorized, HttpOk
 from .models.interaction import Interaction, InteractionResponse, InteractionType
 
 
 class ApplicationClient:
-    def __init__(self, public_key):
+    def __init__(self, public_key, bot_token):
         self.commands = {}
         self.public_key = public_key
+        self.api = DiscordApi(bot_token)
 
     def interact(self, raw_request, signature, timestamp) -> HttpResponse:
         if signature is None or timestamp is None or not verify_key(json.dumps(raw_request, separators=(',', ':'))
@@ -53,3 +56,5 @@ class ApplicationClient:
             print(f"🫴 Response: {response}")
             return response
 
+    def get_guilds(self):
+        return self.api.get("/users/@me/guilds", type_hint=list[PartialGuild])

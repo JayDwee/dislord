@@ -19,10 +19,10 @@ class InteractionData(BaseModel):
     id: Snowflake
     name: str
     type: int
-    # resolved: Optional[ResolvedData] = None FIXME
-    # options: Optional[list[ApplicationCommandInteractionDataOption]] = None FIXME
-    guild_id: Optional[Snowflake] = None
-    target_id: Optional[Snowflake] = None
+    # resolved: Optional[ResolvedData] FIXME
+    # options: Optional[list[ApplicationCommandInteractionDataOption]] FIXME
+    guild_id: Optional[Snowflake]
+    target_id: Optional[Snowflake]
 
 
 @dataclass
@@ -34,23 +34,16 @@ class Interaction(BaseModel):
     version: int
     # entitelements: list[Entitlement] FIXME
 
-    data: Optional[InteractionData] = None
-    guild_id: Optional[Snowflake] = None
-    # channel: Optional[PartialChannel] = None FIXME
-    channel_id: Optional[Snowflake] = None
-    # member: Optional[GuildMember] = None FIXME
-    # user: Optional[User] = None FIXME
-    # message: Optional[Message] = None FIXME
-    app_permissions:  Optional[str] = None
-    locale:  Optional[str] = None  # This is available on all interaction types except PING
-    guild_locale: Optional[str] = None
-
-    def __post_init__(self):
-        if isinstance(self.type, int):
-            self.type = InteractionType(self.type)
-
-        if isinstance(self.data, dict):
-            self.data = InteractionData.from_dict(self.data)
+    data: Optional[InteractionData]
+    guild_id: Optional[Snowflake]
+    # channel: Optional[PartialChannel] FIXME
+    channel_id: Optional[Snowflake]
+    # member: Optional[GuildMember] FIXME
+    # user: Optional[User] FIXME
+    # message: Optional[Message] FIXME
+    app_permissions:  Optional[str]
+    locale:  Optional[str]  # This is available on all interaction types except PING
+    guild_locale: Optional[str]
 
 
 class InteractionCallbackType(Enum):
@@ -66,12 +59,12 @@ class InteractionCallbackType(Enum):
 
 @dataclass
 class InteractionCallbackData(BaseModel):
-    flags: Optional[int] = None
+    flags: Optional[int]
     # components: list[Component] FIXME
     # attachments: list[PartialAttachment] FIXME
 
-    tts: Optional[bool] = None
-    content: Optional[str] = None
+    tts: Optional[bool]
+    content: Optional[str]
     # embeds: Optional[list[Embed]] FIXME
     # allowed_mentions: Optional[AllowedMentions] FIXME
 

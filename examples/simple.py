@@ -3,14 +3,16 @@ import os
 import dislord
 from dislord.models.interaction import Interaction, InteractionResponse
 
-DISCORD_PUBLIC_KEY = os.environ.get("DISCORD_PUBLIC_KEY")
+PUBLIC_KEY = os.environ.get("PUBLIC_KEY")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
-client = dislord.ApplicationClient(DISCORD_PUBLIC_KEY)
+client = dislord.ApplicationClient(PUBLIC_KEY, BOT_TOKEN)
 
 
 @client.command(name="hello")
 def hello(interaction: Interaction):
-    return InteractionResponse.message(content="hello world " + interaction.id)
+    guilds = client.get_guilds()
+    return InteractionResponse.message(content="Servers:\n"+"\n".join([g.name for g in guilds]))
 
 
 def serverless_handler(event, context):  # Not needed if using server
