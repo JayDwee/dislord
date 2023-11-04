@@ -2,6 +2,8 @@ import json
 from dataclasses import dataclass
 from http.client import OK, UNAUTHORIZED
 
+from dislord.models.base import EnhancedJSONEncoder
+
 
 @dataclass
 class HttpResponse:
@@ -15,11 +17,11 @@ class HttpResponse:
 
     def as_serverless_response(self):
         return {"statusCode": int(self.status_code),
-                "body": json.dumps(self.body, separators=(',', ':')) if isinstance(self.body, dict) else self.body,
+                "body": json.dumps(self.body, cls=EnhancedJSONEncoder) if isinstance(self.body, dict) else self.body,
                 "headers": self.headers}
 
     def as_server_response(self):
-        return self.body, int(self.status_code)
+        return json.loads(json.dumps(self.body, cls=EnhancedJSONEncoder)), int(self.status_code)
 
 
 class HttpOk(HttpResponse):

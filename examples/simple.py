@@ -1,14 +1,21 @@
-from dotenv import load_dotenv
+import os
 
-from dislord import interaction, server
+import dislord
+from dislord.models.interaction import Interaction, InteractionResponse
 
-load_dotenv()
+DISCORD_PUBLIC_KEY = os.environ.get("DISCORD_PUBLIC_KEY")
 
-
-@interaction.command(name="hello")
-def hello():
-    return "hello world"
+client = dislord.ApplicationClient(DISCORD_PUBLIC_KEY)
 
 
-if __name__ == '__main__':
-    server.start_server()
+@client.command(name="hello")
+def hello(interaction: Interaction):
+    return InteractionResponse.message(content="hello world " + interaction.id)
+
+
+def serverless_handler(event, context):  # Not needed if using server
+    client.serverless_handler(event, context)
+
+
+if __name__ == '__main__':  # Not needed if using serverless
+    dislord.server.start_server(client, host='0.0.0.0', debug=True, port=8123)

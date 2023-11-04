@@ -1,5 +1,4 @@
-flask[async]~=3.0.0
-discord-interactions
+discord-interactions~=0.4.0
 
-# Examples
-python-dotenv==1.0.0
+# Optional for server support
+flask[async]~=3.0.0

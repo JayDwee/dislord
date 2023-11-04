@@ -1,4 +1,4 @@
-name: Publish Python 🐍 distribution 📦 to PyPI
+name: Build & Publish to PyPI 🐍📦
 on: push
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
     - name: config version
       run: |
         echo "${{github.ref_name}}"
-        if [[ ${{github.ref_name}} =~ ^([0-9]+\.){2}[0-9]+(\-[0-9]+)?$ ]]; then
+        if [[ ${{github.ref_name}} =~ ^([0-9]+\.){2}[0-9]+((\-[0-9]+)?|\.(post|dev)[0-9]+)$ ]]; then
           sed -i 's/version = ".*"/version = "'"${{github.ref_name}}"'"/g' pyproject.toml
           echo "sed completed with "'s/version = ".*"/version = "'"${{github.ref_name}}"'"/g'
         fi
@@ -41,7 +41,7 @@ jobs:
 
   publish-to-pypi:
     name: >-
-      Publish Python 🐍 distribution 📦 to PyPI
+      Publish to PyPI 🐍
     if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
     - build
@@ -61,44 +61,44 @@ jobs:
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
-  github-release:
-    name: >-
-      Sign the Python 🐍 distribution 📦 with Sigstore
-      and upload them to GitHub Release
-    needs:
-    - publish-to-pypi
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write  # IMPORTANT: mandatory for making GitHub Releases
-      id-token: write  # IMPORTANT: mandatory for sigstore
-
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v1.2.3
-      with:
-        inputs: >-
-          ./dist/*.tar.gz
-          ./dist/*.whl
-    - name: Create GitHub Release
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: >-
-        gh release create
-        '${{ github.ref_name }}'
-        --notes ""
-    - name: Upload artifact signatures to GitHub Release
-      env:
-        GH_TOKEN: ${{ github.token }}
-      # Upload to GitHub Release using the `gh` CLI.
-      # `dist/` contains the built packages, and the
-      # sigstore-produced signatures and certificates.
-      run: >-
-        gh release upload
-        '${{ github.ref_name }}' dist/**
-        --repo '${{ github.repository }}'
+#  github-release:
+#    name: >-
+#      Sign the Python 🐍 distribution 📦 with Sigstore
+#      and upload them to GitHub Release
+#    needs:
+#    - publish-to-pypi
+#    runs-on: ubuntu-latest
+#
+#    permissions:
+#      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+#      id-token: write  # IMPORTANT: mandatory for sigstore
+#
+#    steps:
+#    - name: Download all the dists
+#      uses: actions/download-artifact@v3
+#      with:
+#        name: python-package-distributions
+#        path: dist/
+#    - name: Sign the dists with Sigstore
+#      uses: sigstore/gh-action-sigstore-python@v1.2.3
+#      with:
+#        inputs: >-
+#          ./dist/*.tar.gz
+#          ./dist/*.whl
+#    - name: Create GitHub Release
+#      env:
+#        GH_TOKEN: ${{ github.token }}
+#      run: >-
+#        gh release create
+#        '${{ github.ref_name }}'
+#        --notes ""
+#    - name: Upload artifact signatures to GitHub Release
+#      env:
+#        GH_TOKEN: ${{ github.token }}
+#      # Upload to GitHub Release using the `gh` CLI.
+#      # `dist/` contains the built packages, and the
+#      # sigstore-produced signatures and certificates.
+#      run: >-
+#        gh release upload
+#        '${{ github.ref_name }}' dist/**
+#        --repo '${{ github.repository }}'
