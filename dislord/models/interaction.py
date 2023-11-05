@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 from enum import Enum
 
 from dislord.models.base import BaseModel
 from dislord.models.type import Snowflake
+from models.command import ApplicationCommandOptionType
 from models.user import User
 
 
@@ -16,12 +17,21 @@ class InteractionType(Enum):
 
 
 @dataclass
+class ApplicationCommandInteractionDataOption(BaseModel):
+    name: str
+    type: ApplicationCommandOptionType
+    value: Optional[Union[str, int, float, bool]]
+    options: Optional['ApplicationCommandInteractionDataOption']
+    focused: Optional[bool]
+
+
+@dataclass
 class InteractionData(BaseModel):
     id: Snowflake
     name: str
     type: int
     # resolved: Optional[ResolvedData] FIXME
-    # options: Optional[list[ApplicationCommandInteractionDataOption]] FIXME
+    options: Optional[list[ApplicationCommandInteractionDataOption]]
     guild_id: Optional[Snowflake]
     target_id: Optional[Snowflake]
 

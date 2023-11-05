@@ -1,10 +1,12 @@
-from dataclasses import dataclass, MISSING
+from dataclasses import dataclass, MISSING, field
 from enum import Enum
 from typing import Optional, Union
 
 from models.base import BaseModel
+from models.channel import Channel, ChannelType
 from models.locale import Locale
 from models.type import Snowflake, PartialOptional
+from models.user import User
 
 
 class ApplicationCommandOptionType(Enum):
@@ -20,12 +22,23 @@ class ApplicationCommandOptionType(Enum):
     NUMBER = 10
     ATTACHMENT = 11
 
+    def from_python_type(self, type_hint):
+        python_mapping = {str: self.STRING, int: self.INTEGER, bool: self.BOOLEAN,
+                          User: self.USER, Channel: self.CHANNEL,
+                          # Role: self.ROLE, Mentionable: self.MENTIONABLE, FIXME
+                          float: self.NUMBER,
+                          # Attachment: self.ATTACHMENT FIXME
+                          }
+        par = python_mapping.get(type_hint)
+        if par is None:
+            raise RuntimeError(f"Unexpected command param type: {type_hint}")
+
 
 @dataclass
 class ApplicationCommandOptionChoice(BaseModel):
     name: str
     value: [str, int, float]
-    name_localizations: Optional[dict[Locale, str]] = None
+    name_localizations: Optional[dict[Locale, str]]
 
 
 @dataclass
@@ -34,17 +47,17 @@ class ApplicationCommandOption(BaseModel):
     name: str
     description: str
 
-    name_localizations: Optional[dict[Locale, str]] = None
-    description_localizations: Optional[dict[Locale, str]] = None
-    required: Optional[bool] = None
-    choices: Optional[list[ApplicationCommandOptionChoice]] = None
-    options: Optional[list['ApplicationCommandOption']] = None
-    # channel_types: Optional[list[ChannelType]] = None
-    min_value: Optional[Union[int, float]] = None
-    max_value: Optional[Union[int, float]] = None
-    min_length: Optional[int] = None
-    max_length: Optional[int] = None
-    autocomplete: Optional[bool] = None
+    name_localizations: Optional[dict[Locale, str]]
+    description_localizations: Optional[dict[Locale, str]]
+    required: Optional[bool]
+    choices: Optional[list[ApplicationCommandOptionChoice]]
+    options: Optional[list['ApplicationCommandOption']]
+    channel_types: Optional[list[ChannelType]]
+    min_value: Optional[Union[int, float]]
+    max_value: Optional[Union[int, float]]
+    min_length: Optional[int]
+    max_length: Optional[int]
+    autocomplete: Optional[bool]
 
 
 # _ApplicationCommandOption = Union[ApplicationCommandOption]
@@ -83,3 +96,7 @@ class ApplicationCommand(BaseModel):
             result = result and (self_attr if self_attr is not MISSING else None) \
                 == (other_attr if other_attr is not MISSING else None)
         return result
+
+    def __post_init__(self):
+        if self.guild_id is not None and self.guild_id is not MISSING:
+            self.dm_permission = None
