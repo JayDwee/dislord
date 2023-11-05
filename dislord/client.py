@@ -104,9 +104,7 @@ class ApplicationClient:
         if guild_ids:
             for g_id in guild_ids:
                 self.sync_commands(guild_id=g_id, application_id=application_id)
-        elif guild_id is None:
-            return
-
+                
         registered_commands = self._get_commands(guild_id)
         client_commands = self._commands.get(guild_id)
         missing_commands = list(client_commands.values()) if client_commands else []
