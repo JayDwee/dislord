@@ -23,7 +23,7 @@ def hello(interaction: Interaction):
 
 
 def serverless_handler(event, context):  # Not needed if using server
-    client.serverless_handler(event, context)
+    return client.serverless_handler(event, context)
 
 
 if __name__ == '__main__':  # Not needed if using serverless

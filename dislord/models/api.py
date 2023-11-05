@@ -17,7 +17,7 @@ class HttpResponse:
 
     def as_serverless_response(self):
         return {"statusCode": int(self.status_code),
-                "body": json.dumps(self.body, cls=EnhancedJSONEncoder) if isinstance(self.body, dict) else self.body,
+                "body": json.dumps(self.body, cls=EnhancedJSONEncoder),
                 "headers": self.headers}
 
     def as_server_response(self):
