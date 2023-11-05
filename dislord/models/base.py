@@ -52,6 +52,10 @@ class BaseModel:
         obj.client = client
         return obj
 
+    @classmethod
+    def from_kwargs(cls, *, client, **kwargs):
+        return cls.from_dict(kwargs, client)
+
     @staticmethod
     def is_base_model():
         return True

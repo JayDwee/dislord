@@ -1,10 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, MISSING
 from enum import Enum
 from typing import Optional, Union
 
 from models.base import BaseModel
 from models.locale import Locale
-from models.type import Snowflake
+from models.type import Snowflake, PartialOptional
 
 
 class ApplicationCommandOptionType(Enum):
@@ -46,6 +46,7 @@ class ApplicationCommandOption(BaseModel):
     max_length: Optional[int] = None
     autocomplete: Optional[bool] = None
 
+
 # _ApplicationCommandOption = Union[ApplicationCommandOption]
 
 class ApplicationCommandType(Enum):
@@ -56,18 +57,29 @@ class ApplicationCommandType(Enum):
 
 @dataclass
 class ApplicationCommand(BaseModel):
-    id: Snowflake
-    application_id: Snowflake
-    guild_id: Snowflake
+    id: PartialOptional[Snowflake]
+    application_id: PartialOptional[Snowflake]
+    guild_id: Optional[Snowflake]
     name: str
-    description: str
-    version: Snowflake
+    description: Optional[str]
+    version: PartialOptional[Snowflake]
 
-    type: Optional[ApplicationCommandType] = None
-    name_localizations: Optional[dict[Locale, str]] = None
-    description_localizations: Optional[dict[Locale, str]] = None
-    options: Optional[list[ApplicationCommandOption]] = None
-    default_member_permissions: Optional[str] = None
-    dm_permission: Optional[bool] = None
-    default_permission: Optional[bool] = None
-    nsfw: Optional[bool] = None
+    type: Optional[ApplicationCommandType]
+    name_localizations: Optional[dict[Locale, str]]
+    description_localizations: Optional[dict[Locale, str]]
+    options: Optional[list[ApplicationCommandOption]]
+    default_member_permissions: Optional[str]
+    dm_permission: Optional[bool]
+    default_permission: Optional[bool]
+    nsfw: Optional[bool]
+
+    def __eq__(self, other):
+        eq_list = ['guild_id', 'name', 'description', 'type', 'name_localization', 'description_localizations',
+                   'options', 'default_member_permissions', 'dm_permission', 'default_permission', 'nsfw']
+        result = True
+        for eq_attr in eq_list:
+            self_attr = getattr(self, eq_attr, None)
+            other_attr = getattr(other, eq_attr, None)
+            result = result and (self_attr if self_attr is not MISSING else None) \
+                == (other_attr if other_attr is not MISSING else None)
+        return result

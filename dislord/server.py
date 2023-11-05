@@ -1,4 +1,4 @@
-from dislord.application import ApplicationClient
+from dislord.client import ApplicationClient
 
 try:
     from flask import Flask, request
