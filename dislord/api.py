@@ -1,8 +1,8 @@
 import json
 import requests
 
-from error import DiscordApiException
-from models.base import cast, EnhancedJSONEncoder
+from .error import DiscordApiException
+from .models.base import cast, EnhancedJSONEncoder
 
 DISCORD_API_VERSION = 10
 DISCORD_URL = f"https://discord.com/api/v{DISCORD_API_VERSION}"

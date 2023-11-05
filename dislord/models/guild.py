@@ -1,8 +1,8 @@
 from typing import Optional
 from dataclasses import dataclass, MISSING
 
-from models.base import BaseModel
-from models.type import Snowflake, PartialOptional
+from .base import BaseModel
+from .type import Snowflake, PartialOptional
 
 
 @dataclass

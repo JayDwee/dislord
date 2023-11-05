@@ -2,11 +2,11 @@ from dataclasses import dataclass, MISSING, field
 from enum import Enum
 from typing import Optional, Union
 
-from models.base import BaseModel
-from models.channel import Channel, ChannelType
-from models.locale import Locale
-from models.type import Snowflake, PartialOptional
-from models.user import User
+from .base import BaseModel
+from .channel import Channel, ChannelType
+from .locale import Locale
+from .type import Snowflake, PartialOptional
+from .user import User
 
 
 class ApplicationCommandOptionType(Enum):

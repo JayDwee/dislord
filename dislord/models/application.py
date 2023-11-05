@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from models.base import BaseModel
-from models.guild import PartialGuild
-from models.type import Snowflake
-from models.user import User
+from .base import BaseModel
+from .guild import PartialGuild
+from .type import Snowflake
+from .user import User
 
 
 @dataclass

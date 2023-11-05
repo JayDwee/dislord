@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass
 from http.client import OK, UNAUTHORIZED
 
-from dislord.models.base import EnhancedJSONEncoder
+from .base import EnhancedJSONEncoder
 
 
 @dataclass

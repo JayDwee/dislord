@@ -4,15 +4,15 @@ from typing import Callable
 
 from discord_interactions import verify_key
 
-from api import DiscordApi
-from models.application import Application
-from models.channel import Channel
-from models.command import ApplicationCommand, ApplicationCommandType, ApplicationCommandOption
-from models.guild import Guild, PartialGuild
-from models.type import Snowflake
-from models.user import User
+from .api import DiscordApi
+from .models.application import Application
+from .models.channel import Channel
+from .models.command import ApplicationCommand, ApplicationCommandType, ApplicationCommandOption
+from .models.guild import Guild, PartialGuild
+from .models.type import Snowflake
+from .models.user import User
 from .error import DiscordApiException
-from models.api import HttpResponse, HttpUnauthorized, HttpOk
+from .models.api import HttpResponse, HttpUnauthorized, HttpOk
 from .models.interaction import Interaction, InteractionResponse, InteractionType
 
 

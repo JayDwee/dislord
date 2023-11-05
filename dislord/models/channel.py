@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
-from models.base import BaseModel
-from models.type import Snowflake
-from models.user import User
+from .base import BaseModel
+from .type import Snowflake
+from .user import User
 
 
 class OverwriteType(Enum):

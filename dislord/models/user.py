@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from models.base import BaseModel
-from models.type import Snowflake
+from .base import BaseModel
+from .type import Snowflake
 
 
 @dataclass

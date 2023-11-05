@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from typing import Optional, Union
 from enum import Enum
 
-from dislord.models.base import BaseModel
-from dislord.models.type import Snowflake
-from models.command import ApplicationCommandOptionType
-from models.user import User
+from .base import BaseModel
+from .type import Snowflake
+from .command import ApplicationCommandOptionType
+from .user import User
 
 
 class InteractionType(Enum):
