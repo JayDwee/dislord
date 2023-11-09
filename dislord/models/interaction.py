@@ -21,7 +21,7 @@ class ApplicationCommandInteractionDataOption(BaseModel):
     name: str
     type: ApplicationCommandOptionType
     value: Optional[Union[str, int, float, bool]]
-    options: Optional['ApplicationCommandInteractionDataOption']
+    options: Optional[list['ApplicationCommandInteractionDataOption']]
     focused: Optional[bool]
 
 

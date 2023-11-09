@@ -1,8 +1,8 @@
 from typing import Optional
-from dataclasses import dataclass, MISSING
+from dataclasses import dataclass
 
 from .base import BaseModel
-from .type import Snowflake, PartialOptional
+from .type import Snowflake, PartialOptional, Missing
 
 
 @dataclass
@@ -55,7 +55,7 @@ class Guild(BaseModel):
 class PartialGuild(Guild):
     def __getattribute__(self, item):
         attr = super().__getattribute__(item)
-        if attr is MISSING:
+        if attr is Missing:
             self.__class__ = Guild
             guild = self.client.get_guild(self.id)
             for a in self.__annotations__:

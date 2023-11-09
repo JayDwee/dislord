@@ -1,11 +1,11 @@
-from dataclasses import dataclass, MISSING, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Union
 
-from .base import BaseModel
+from .base import BaseModel, compare_missing_none
 from .channel import Channel, ChannelType
 from .locale import Locale
-from .type import Snowflake, PartialOptional
+from .type import Snowflake, PartialOptional, Missing
 from .user import User
 
 
@@ -32,6 +32,12 @@ class ApplicationCommandOptionType(Enum):
         par = python_mapping.get(type_hint)
         if par is None:
             raise RuntimeError(f"Unexpected command param type: {type_hint}")
+
+    def __eq__(self, other):
+        try:
+            return self.value == other.value
+        except Exception:
+            return False
 
 
 @dataclass
@@ -93,10 +99,9 @@ class ApplicationCommand(BaseModel):
         for eq_attr in eq_list:
             self_attr = getattr(self, eq_attr, None)
             other_attr = getattr(other, eq_attr, None)
-            result = result and (self_attr if self_attr is not MISSING else None) \
-                == (other_attr if other_attr is not MISSING else None)
+            result = result and (self_attr == other_attr or self_attr is other_attr) # compare_missing_none(self_attr, other_attr)
         return result
 
     def __post_init__(self):
-        if self.guild_id is not None and self.guild_id is not MISSING:
+        if self.guild_id is not None and self.guild_id is not Missing:
             self.dm_permission = None

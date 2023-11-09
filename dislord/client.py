@@ -1,15 +1,15 @@
 import json
-from dataclasses import MISSING
-from typing import Callable
+from typing import Callable, Union
 
 from discord_interactions import verify_key
 
+from .group import CommandGroup
 from .api import DiscordApi
 from .models.application import Application
 from .models.channel import Channel
 from .models.command import ApplicationCommand, ApplicationCommandType, ApplicationCommandOption
 from .models.guild import Guild, PartialGuild
-from .models.type import Snowflake
+from .models.type import Snowflake, Missing
 from .models.user import User
 from .error import DiscordApiException
 from .models.api import HttpResponse, HttpUnauthorized, HttpOk
@@ -21,8 +21,8 @@ class ApplicationClient:
     _api: DiscordApi
     _commands: dict[Snowflake, dict[str, ApplicationCommand]] = {}
     _command_callbacks: dict[str, Callable] = {}
-    _application: Application = MISSING
-    _guilds: list[Guild] = MISSING
+    _application: Application = Missing
+    _guilds: list[Guild] = Missing
 
     def __init__(self, public_key, bot_token):
         self._public_key = public_key
@@ -72,6 +72,17 @@ class ApplicationClient:
 
         return decorator
 
+    def register_group(self, command_group: CommandGroup):
+        if self._commands.get(command_group.guild_id) is None:
+            self._commands[command_group.guild_id] = {}
+
+        self._commands[command_group.guild_id][command_group.name] = ApplicationCommand.from_kwargs(
+            name=command_group.name, description=command_group.description, type=ApplicationCommandType.CHAT_INPUT,
+            dm_permission=command_group.dm_permission, nsfw=command_group.nsfw, guild_id=command_group.guild_id,
+            options=list(command_group.commands.values()), client=self)
+
+        self._command_callbacks[command_group.name] = command_group.callback
+
     def serverless_handler(self, event, context):
         if event['httpMethod'] == "POST":
             print(f"🫱 Full Event: {event}")
@@ -86,13 +97,13 @@ class ApplicationClient:
 
     @property
     def application(self):
-        if self._application is MISSING:
+        if self._application is Missing:
             self._application = self.get_application()
         return self._application
 
     @property
     def guilds(self):
-        if self._guilds is MISSING:
+        if self._guilds is Missing:
             self._guilds = self._get_guilds()
         return self._guilds
 
